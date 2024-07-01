@@ -27,7 +27,7 @@ fi
 
 # Deploy the application
 echo "Deploying application to Kubernetes..."
-kubectl --kubeconfig="$KUBE_CONFIG" apply -f myapp/templates/deployment.yaml -n "$NAMESPACE"
+kubectl --kubeconfig="$KUBE_CONFIG" apply -f mywebapp/templates/deployment.yaml -n "$NAMESPACE"
 
 # Check deployment status
 echo "Waiting for deployment rollout to complete..."
@@ -37,4 +37,17 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "Deployment completed successfully."
+echo "Exposing application via service..."
+kubectl --kubeconfig="$KUBE_CONFIG" apply -f myapp/templates/service.yaml -n "$NAMESPACE"
+
+# Check service status
+echo "Waiting for service to be created..."
+kubectl --kubeconfig="$KUBE_CONFIG" wait --for=condition=available --timeout=60s service/"$DEPLOYMENT_NAME" -n "$NAMESPACE"
+if [ $? -ne 0 ]; then
+  echo "Service creation failed or timed out."
+  exit 1
+fi
+
+echo "Service creation completed successfully."
+
+echo "Deployment and service creation completed successfully."

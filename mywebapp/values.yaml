@@ -1,0 +1,4 @@
+service:
+  type: ClusterIP  # Use 'LoadBalancer' if you want to expose externally
+  port: 80          # Service port
+  targetPort: 8080  # Container port
