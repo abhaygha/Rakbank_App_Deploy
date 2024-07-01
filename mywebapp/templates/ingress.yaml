@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "mywebapp.fullname" . }}
+  name: mywebapp-ingress  # Replace with your desired Ingress name
   labels:
-    {{- include "mywebapp.labels" . | nindent 4 }}
+    app: mywebapp
 spec:
   rules:
-    - host: yourdomain.com
+    - host: webapp.com  # Replace with your actual domain
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: {{ include "mywebapp.fullname" . }}
+                name: mywebapp-service  # Replace with your service name
                 port:
-                  number: 80
+                  number: 80  # Replace with your service port

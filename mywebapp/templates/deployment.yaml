@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "mywebapp.fullname" . }}
+  name: mywebapp-deployment  # Replace with your desired deployment name
   labels:
-    {{- include "mywebapp.labels" . | nindent 4 }}
+    app: mywebapp
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1  # Replace with .Values.replicaCount if using Helm
   selector:
     matchLabels:
-      {{- include "mywebapp.selectorLabels" . | nindent 6 }}
+      app: mywebapp
   template:
     metadata:
       labels:
-        {{- include "mywebapp.selectorLabels" . | nindent 8 }}
+        app: mywebapp
     spec:
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: mywebapp-container  # Replace with your container name
+          image: "your/image:tag"  # Replace with your image repository and tag
+          imagePullPolicy: Always  # Replace with your image pull policy
           ports:
-            - containerPort: 8080
+            - containerPort: 8080  # Replace with your container port
           resources:
             limits:
-              cpu: 200m
-              memory: 512Mi
+              cpu: "200m"  # Replace with your CPU limit
+              memory: "512Mi"  # Replace with your memory limit
             requests:
-              cpu: 100m
-              memory: 256Mi 
+              cpu: "100m"  # Replace with your CPU request
+              memory: "256Mi"  # Replace with your memory request

@@ -2,7 +2,7 @@
 
 # Set the namespace and deployment name
 NAMESPACE="default"
-DEPLOYMENT_NAME="myapp-deployment"
+DEPLOYMENT_NAME="mywebapp-deployment"
 
 echo "Current KUBECONFIG: $KUBE_CONFIG"
 echo "Environment variables:"
