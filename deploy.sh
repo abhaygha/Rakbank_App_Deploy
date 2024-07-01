@@ -38,7 +38,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Exposing application via service..."
-kubectl --kubeconfig="$KUBE_CONFIG" apply -f myapp/templates/service.yaml -n "$NAMESPACE"
+kubectl --kubeconfig="$KUBE_CONFIG" apply -f mywebapp/templates/service.yaml -n "$NAMESPACE"
 
 # Check service status
 echo "Waiting for service to be created..."
