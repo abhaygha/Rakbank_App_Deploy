@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION: us-east-2  # Set the AWS region as an environment variable
+      AWS_REGION: us-east-1  # Set the AWS region as an environment variable
 
     steps:
     - name: Checkout code
