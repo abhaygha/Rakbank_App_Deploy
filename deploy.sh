@@ -27,7 +27,7 @@ kubectl --kubeconfig="$KUBE_CONFIG" apply -f mywebapp/templates/deployment.yaml 
 
 # Check deployment status
 echo "Waiting for deployment rollout to complete..."
-kubectl --kubeconfig="$KUBE_CONFIG" rollout status deployment/"$DEPLOYMENT_NAME" -n "$NAMESPACE" --timeout=10m
+kubectl --kubeconfig="$KUBE_CONFIG" rollout status deployment/"$DEPLOYMENT_NAME" -n "$NAMESPACE" --timeout=5m
 if [ $? -ne 0 ]; then
   echo "Deployment rollout failed or timed out."
   exit 1
