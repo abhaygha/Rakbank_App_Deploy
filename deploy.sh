@@ -8,9 +8,10 @@ DEPLOYMENT_NAME="myapp-deployment"
 KUBE_CONFIG=${KUBECONFIG:-"$HOME/.kube/config"}
 
 # Check if KUBECONFIG is set and the file exists
-if [ -z "$KUBECONFIG" ] || [ ! -f "$KUBECONFIG" ]; then
-  echo "KUBECONFIG is not set or the file does not exist."
-  exit 1
+if [ -z "$KUBECONFIG" ] || [ ! -f "$KUBE_CONFIG" ]; then
+  echo "KUBECONFIG is not set or the file does not exist. Setting it explicitly."
+  # Set KUBECONFIG explicitly based on your configuration
+  KUBE_CONFIG="$HOME/.kube/config"  # Adjust this if your KUBECONFIG is stored elsewhere
 fi
 
 # Check connectivity to Kubernetes cluster
