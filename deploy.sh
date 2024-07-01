@@ -7,6 +7,8 @@ DEPLOYMENT_NAME="myapp-deployment"
 # Ensure kubectl is configured correctly
 KUBE_CONFIG=${KUBECONFIG:-"$HOME/.kube/config"}
 
+echo "Current KUBECONFIG: $KUBE_CONFIG"
+
 # Check if KUBECONFIG is set and the file exists
 if [ -z "$KUBECONFIG" ] || [ ! -f "$KUBE_CONFIG" ]; then
   echo "KUBECONFIG is not set or the file does not exist. Setting it explicitly."
