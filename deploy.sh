@@ -27,7 +27,7 @@ fi
 
 # Deploy the application
 echo "Deploying application to Kubernetes..."
-kubectl --kubeconfig="$KUBE_CONFIG" apply -f deployment.yaml -n "$NAMESPACE"
+kubectl --kubeconfig="$KUBE_CONFIG" apply -f myapp/templates/deployment.yaml -n "$NAMESPACE"
 
 # Check deployment status
 echo "Waiting for deployment rollout to complete..."
