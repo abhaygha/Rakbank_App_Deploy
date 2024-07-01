@@ -4,10 +4,12 @@
 NAMESPACE="default"
 DEPLOYMENT_NAME="myapp-deployment"
 
+echo "Current KUBECONFIG: $KUBE_CONFIG"
+echo "Environment variables:"
+env
+
 # Ensure kubectl is configured correctly
 KUBE_CONFIG=${KUBECONFIG:-"$HOME/.kube/config"}
-
-echo "Current KUBECONFIG: $KUBE_CONFIG"
 
 # Check if KUBECONFIG is set and the file exists
 if [ -z "$KUBECONFIG" ] || [ ! -f "$KUBE_CONFIG" ]; then
