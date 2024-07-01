@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION: us-west-2  # Set the AWS region as an environment variable
+      AWS_REGION: us-east-2  # Set the AWS region as an environment variable
 
     steps:
     - name: Checkout code
@@ -41,7 +41,7 @@ jobs:
 
     - name: Build, tag, and push image to Amazon ECR
       env:
-        ECR_REGISTRY: 891377120087.dkr.ecr.us-west-2.amazonaws.com
+        ECR_REGISTRY: 891377120087.dkr.ecr.us-east-1.amazonaws.com
         ECR_REPOSITORY: rakbank/demo
         VERSION: ${{ env.VERSION }}
       run: |
