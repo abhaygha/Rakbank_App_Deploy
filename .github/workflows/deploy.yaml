@@ -72,6 +72,9 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
 
+    - name: Grant execute permission to deploy.sh
+      run: chmod +x ./deploy.sh
+
     - name: Deploy to EKS
       env:
         KUBECONFIG: ${{ secrets.KUBECONFIG }}
