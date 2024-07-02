@@ -103,19 +103,14 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
-    - name: Install SonarScanner for Maven
-      uses: sonarsource/sonarcloud-github-action@v2
+    - name: Analyze with SonarCloud
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        projectBaseDir: .
-  
-    - name: Run SonarScanner for Code Quality Analysis
       run: mvn sonar:sonar \
-         -Dsonar.projectKey=abhaygha_Rakbank_App_Deploy \
-         -Dsonar.organization=abhaygha \
-         -Dsonar.host.url=https://sonarcloud.io \
-         -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.projectKey=abhaygha_Rakbank_App_Deploy \
+          -Dsonar.organization=abhaygha \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
   
 
 
