@@ -104,7 +104,7 @@ jobs:
         KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
     - name: Install SonarScanner for Maven
-      uses: sonarsource/sonar-scanner-cli@latest
+      uses: sonarsource/sonarcloud-github-action@v2
 
     - name: Run SonarScanner for Code Quality Analysis
       run: mvn sonar:sonar -Dsonar.projectKey=abhaygha_Rakbank_App_Deploy -Dsonar.organization=abhaygha
