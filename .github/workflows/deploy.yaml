@@ -38,12 +38,16 @@ jobs:
     - name: List target directory contents
       run: ls -l target
 
-    - name: Set Docker image tag
+    - name: Determine Docker image tag
       id: get_version
-      run: echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV  # Using ref name directly
-
-    - name: Debug VERSION
-      run: echo "VERSION is ${{ env.VERSION }}"  # Debug output to verify VERSION is set
+      run: |
+        if [ "${GITHUB_REF_TYPE}" == "tag" ]; then
+          VERSION=${GITHUB_REF_NAME}
+        else
+          VERSION=$(git describe --tags --always)
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "VERSION=$VERSION"  # Debug output
     
 
     - name: Configure AWS credentials
@@ -67,7 +71,6 @@ jobs:
         ECR_REPOSITORY: rakbank
         VERSION: ${{ env.VERSION }}
       run: |
-        echo "Building and pushing Docker image with tag $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION"  # Debug output
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
 
