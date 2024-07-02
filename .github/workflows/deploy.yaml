@@ -38,6 +38,10 @@ jobs:
         projectKey: abhaygha_Rakbank_App_Deploy
         organization: abhaygha
         token: ${{ secrets.SONAR_TOKEN }}
+        projectBaseDir: .
+      env:
+        AWS_REGION: us-east-1
+        JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.11-9/x64
 
     - name: Check SonarCloud Quality Gate
       uses: sonarsource/sonarcloud-github-action@v2
