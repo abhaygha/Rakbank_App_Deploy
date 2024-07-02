@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: mywebapp-container  # Replace with your container name
-          image: "891377120087.dkr.ecr.us-east-1.amazonaws.com/rakbank:latest"  # Use the version dynamically passed from GitHub Actions
+          image: "891377120087.dkr.ecr.us-east-1.amazonaws.com/rakbank:${VERSION}"  # Use the version dynamically passed from GitHub Actions
           imagePullPolicy: Always  # Replace with your image pull policy
           ports:
             - containerPort: 8080  # Replace with your container port
