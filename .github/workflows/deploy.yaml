@@ -39,10 +39,8 @@ jobs:
 
     - name: Check SonarCloud Quality Gate
       uses: sonarsource/sonarcloud-github-action@v2
-      with:
-        token: ${{ secrets.SONAR_TOKEN }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOEKN: ${{ secrets.SONAR_TOKEN }}
 
     - name: Check Quality Gate Status
       id: check_quality_gate
