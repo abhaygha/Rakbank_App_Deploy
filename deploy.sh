@@ -42,24 +42,10 @@ fi
 echo "Exposing application via service..."
 kubectl apply -f mywebapp/templates/service.yaml -n "$NAMESPACE"
 
-# Wait for service to be created
-echo "Waiting for service to be created..."
-kubectl wait --for=condition=available --timeout=60s service/"$SERVICE_NAME" -n "$NAMESPACE"
-if [ $? -ne 0 ]; then
-  echo "Service creation failed or timed out."
-  exit 1
-fi
 
 # Deploy the ingress
 echo "Creating Ingress for the application..."
 kubectl apply -f mywebapp/templates/ingress.yaml -n "$NAMESPACE"
 
-# Wait for Ingress to be created
-echo "Waiting for Ingress to be created..."
-kubectl wait --for=condition=ready --timeout=60s ingress/"$INGRESS_NAME" -n "$NAMESPACE"
-if [ $? -ne 0 ]; then
-  echo "Ingress creation failed or timed out."
-  exit 1
-fi
 
 echo "Deployment, service, and ingress creation completed successfully."
