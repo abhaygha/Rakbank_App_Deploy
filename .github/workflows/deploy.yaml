@@ -106,7 +106,7 @@ jobs:
     - name: Install SonarScanner for Maven
       uses: sonarsource/sonarcloud-github-action@v2
       with:
-        sonar.login: ${{ secrets.SONAR_TOKEN }}  # Replace with your actual project key
+        sonar-token: ${{ secrets.SONAR_TOKEN }}
   
     - name: Run SonarScanner for Code Quality Analysis
       run: mvn sonar:sonar \
