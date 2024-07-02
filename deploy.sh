@@ -21,24 +21,20 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Get the version from the argument
-VERSION=$1
-if [ -z "$VERSION" ]; then
-  echo "No version provided. Please provide the version as the first argument."
-  exit 1
-fi
-
-# Update the deployment image with the provided version
-echo "Updating deployment image to version $VERSION..."
-kubectl --kubeconfig="$KUBE_CONFIG" set image deployment/"$DEPLOYMENT_NAME" mywebapp-container=891377120087.dkr.ecr.us-east-1.amazonaws.com/rakbank:$VERSION -n "$NAMESPACE"
+# Deploy the application if it does not exist
+kubectl --kubeconfig="$KUBE_CONFIG" get deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE"
 if [ $? -ne 0 ]; then
-  echo "Failed to update the deployment image. Please check your configuration."
-  exit 1
+  echo "Creating new deployment..."
+  sed -i "s|IMAGE_PLACEHOLDER|891377120087.dkr.ecr.us-east-1.amazonaws.com/rakbank:$1|" mywebapp/templates/deployment.yaml
+  kubectl --kubeconfig="$KUBE_CONFIG" apply -f mywebapp/templates/deployment.yaml -n "$NAMESPACE"
+else
+  echo "Updating deployment image to version $1..."
+  kubectl --kubeconfig="$KUBE_CONFIG" set image deployment/"$DEPLOYMENT_NAME" mywebapp-container=891377120087.dkr.ecr.us-east-1.amazonaws.com/rakbank:$1 -n "$NAMESPACE"
+  if [ $? -ne 0 ]; then
+    echo "Failed to update the deployment image. Please check your configuration."
+    exit 1
+  fi
 fi
-
-# Deploy the application
-echo "Deploying application to Kubernetes..."
-kubectl --kubeconfig="$KUBE_CONFIG" apply -f mywebapp/templates/deployment.yaml -n "$NAMESPACE"
 
 # Check deployment status
 echo "Waiting for deployment rollout to complete..."
