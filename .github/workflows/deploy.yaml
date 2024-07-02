@@ -32,9 +32,6 @@ jobs:
         java-package: 'jdk'
         architecture: 'x64'
         check-latest: false
-
-    - name: Build with Maven
-      run: mvn clean package
     
     - name: Analyze with SonarCloud
       env:
@@ -72,6 +69,9 @@ jobs:
         fi
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    - name: Build with Maven
+      run: mvn clean package
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
