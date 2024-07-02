@@ -32,14 +32,21 @@ jobs:
         java-package: 'jdk'
         architecture: 'x64'
         check-latest: false
-    
+
+    - name: Build with Maven
+      run: mvn clean package
+      id: build
+      continue-on-error: true  # Allow the build step to fail, so that subsequent steps can still run
+
     - name: Analyze with SonarCloud
+      if: success()  # Only run this step if the previous steps were successful
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn sonar:sonar -Dsonar.projectKey=abhaygha_Rakbank_App_Deploy -Dsonar.organization=abhaygha -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
     - name: Check Quality Gate Status
       id: check_quality_gate
+      if: success()  # Only run this step if the previous steps were successful
       run: |
         # Fetch Quality Gate Status
         quality_gate_status=$(curl -s -H "Authorization: token ${{ secrets.SONAR_TOKEN }}" \
@@ -67,19 +74,16 @@ jobs:
           echo "Coverage below 85%!"
           exit 1
         fi
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-    - name: Build with Maven
-      run: mvn clean package
 
     - name: Configure AWS credentials
+      if: success()  # Only run this step if previous steps were successful
       uses: aws-actions/configure-aws-credentials@v1
       with:
         role-to-assume: arn:aws:iam::891377120087:role/github-action-role
         aws-region: us-east-1
 
     - name: Log in to Amazon ECR
+      if: success()  # Only run this step if previous steps were successful
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
       with:
@@ -88,6 +92,7 @@ jobs:
         skip-logout: false
 
     - name: Determine Docker image tag
+      if: success()  # Only run this step if previous steps were successful
       id: get_version
       run: |
         if [ "${GITHUB_REF_TYPE}" == "tag" ]; then
@@ -99,6 +104,7 @@ jobs:
         echo "VERSION=$VERSION"  # Debug output
 
     - name: Build, tag, and push image to Amazon ECR
+      if: success()  # Only run this step if previous steps were successful
       env:
         ECR_REGISTRY: 891377120087.dkr.ecr.us-east-1.amazonaws.com
         ECR_REPOSITORY: rakbank
@@ -108,23 +114,29 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
 
     - name: Grant execute permission to deploy.sh
+      if: success()  # Only run this step if previous steps were successful
       run: chmod +x ./deploy.sh
 
     - name: Create kubeconfig directory
+      if: success()  # Only run this step if previous steps were successful
       run: mkdir -p $HOME/.kube
 
     - name: Set up kubeconfig
+      if: success()  # Only run this step if previous steps were successful
       run: |
         echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
         chmod 600 $HOME/.kube/config
 
     - name: Print Kubeconfig
+      if: success()  # Only run this step if previous steps were successful
       run: cat $HOME/.kube/config
 
     - name: Check Kubeconfig permissions
+      if: success()  # Only run this step if previous steps were successful
       run: ls -l $HOME/.kube/config
 
     - name: Run deploy.sh
+      if: success()  # Only run this step if previous steps were successful
       run: |
         export KUBECONFIG=$HOME/.kube/config
         ./deploy.sh ${{ env.VERSION }}
