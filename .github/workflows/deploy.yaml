@@ -18,7 +18,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      security-events: read  # Required for SonarCloud to check Quality Gate status
+      security-events: read
 
     steps:
     - name: Checkout code
