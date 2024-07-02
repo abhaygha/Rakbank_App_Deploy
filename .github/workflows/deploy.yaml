@@ -35,7 +35,12 @@ jobs:
     - name: Analyze with SonarCloud
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn sonar:sonar -Dsonar.projectKey=abhaygha_Rakbank_App_Deploy -Dsonar.organization=abhaygha -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      run: |
+         mvn clean verify sonar:sonar \
+         -Dsonar.projectKey=abhaygha_Rakbank_App_Deploy \
+         -Dsonar.organization=abhaygha \
+         -Dsonar.host.url=https://sonarcloud.io \
+         -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
     - name: Check SonarCloud Quality Gate
       uses: sonarsource/sonarcloud-github-action@v2
