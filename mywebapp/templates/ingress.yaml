@@ -6,7 +6,7 @@ metadata:
     app: mywebapp
 spec:
   rules:
-    - host: webapp.com  # Replace with your actual domain
+    - host: rakbank.com  # Replace with your actual domain
       http:
         paths:
           - path: /
