@@ -41,22 +41,34 @@ jobs:
     - name: Check Quality Gate Status
       id: check_quality_gate
       run: |
+        # Fetch Quality Gate Status
         quality_gate_status=$(curl -s -H "Authorization: token ${{ secrets.SONAR_TOKEN }}" \
           -X GET "https://sonarcloud.io/api/qualitygates/project_status?projectKey=abhaygha_Rakbank_App_Deploy" | \
           jq -r '.projectStatus.status')
+        echo "Quality Gate Status: $quality_gate_status"
+        
+        # Fetch Coverage
         coverage=$(curl -s -H "Authorization: token ${{ secrets.SONAR_TOKEN }}" \
           -X GET "https://sonarcloud.io/api/measures/component?component=abhaygha_Rakbank_App_Deploy&metricKeys=coverage" | \
-          jq -r '.component.measures[0].value')
-        echo "Quality Gate Status: $quality_gate_status"
+          jq -r '.component.measures[0].value' | sed 's/%//')
         echo "Coverage: $coverage"
+        
+        # Debug the fetched data
+        echo "Debug Info: $quality_gate_status, $coverage"
+
+        # Check if the Quality Gate status is OK
         if [ "$quality_gate_status" != "OK" ]; then
           echo "Quality Gate failed!"
           exit 1
         fi
+
+        # Check if the coverage is below 85%
         if (( $(echo "$coverage < 85" | bc -l) )); then
-          echo "Coverage below 60%!"
+          echo "Coverage below 85%!"
           exit 1
         fi
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     - name: Build with Maven
       run: mvn clean package
@@ -64,7 +76,7 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        role-to-assume: arn:aws:iam::891377120087:role/github-role
+        role-to-assume: arn:aws:iam::891377120087:role/github-action-role
         aws-region: us-east-1
 
     - name: Log in to Amazon ECR
