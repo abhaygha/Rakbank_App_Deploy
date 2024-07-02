@@ -18,6 +18,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      security-events: read  # Required for SonarCloud to check Quality Gate status
 
     steps:
     - name: Checkout code
@@ -33,42 +34,29 @@ jobs:
         check-latest: false
 
     - name: Analyze with SonarCloud
-      uses: sonarsource/sonarcloud-github-action@v2
-      with:
-        projectKey: abhaygha_Rakbank_App_Deploy
-        organization: abhaygha
-        token: ${{ secrets.SONAR_TOKEN }}
-        projectBaseDir: .
-      env:
-        AWS_REGION: us-east-1
-        JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.11-9/x64
-
-    - name: Check SonarCloud Quality Gate
-      uses: sonarsource/sonarcloud-github-action@v2
-      with:
-        projectBaseDir: .
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn sonar:sonar -Dsonar.projectKey=abhaygha_Rakbank_App_Deploy -Dsonar.organization=abhaygha -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
     - name: Check Quality Gate Status
       id: check_quality_gate
       run: |
-          quality_gate_status=$(curl -s -H "Authorization: token ${{ secrets.SONAR_TOKEN }}" \
-            -X GET "https://sonarcloud.io/api/qualitygates/project_status?projectKey=abhaygha_Rakbank_App_Deploy" | \
-            jq -r '.projectStatus.status')
-          coverage=$(curl -s -H "Authorization: token ${{ secrets.SONAR_TOKEN }}" \
-            -X GET "https://sonarcloud.io/api/measures/component?component=abhaygha_Rakbank_App_Deploy&metricKeys=coverage" | \
-            jq -r '.component.measures[0].value')
-          echo "Quality Gate Status: $quality_gate_status"
-          echo "Coverage: $coverage"
-          if [ "$quality_gate_status" != "OK" ]; then
-            echo "Quality Gate failed!"
-            exit 1
-          fi
-          if (( $(echo "$coverage < 85" | bc -l) )); then
-            echo "Coverage below 85%!"
-            exit 1
-          fi  
+        quality_gate_status=$(curl -s -H "Authorization: token ${{ secrets.SONAR_TOKEN }}" \
+          -X GET "https://sonarcloud.io/api/qualitygates/project_status?projectKey=abhaygha_Rakbank_App_Deploy" | \
+          jq -r '.projectStatus.status')
+        coverage=$(curl -s -H "Authorization: token ${{ secrets.SONAR_TOKEN }}" \
+          -X GET "https://sonarcloud.io/api/measures/component?component=abhaygha_Rakbank_App_Deploy&metricKeys=coverage" | \
+          jq -r '.component.measures[0].value')
+        echo "Quality Gate Status: $quality_gate_status"
+        echo "Coverage: $coverage"
+        if [ "$quality_gate_status" != "OK" ]; then
+          echo "Quality Gate failed!"
+          exit 1
+        fi
+        if (( $(echo "$coverage < 85" | bc -l) )); then
+          echo "Coverage below 85%!"
+          exit 1
+        fi
 
     - name: Build with Maven
       run: mvn clean package
@@ -76,7 +64,7 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        role-to-assume: arn:aws:iam::891377120087:role/github-action-role
+        role-to-assume: arn:aws:iam::891377120087:role/github-role
         aws-region: us-east-1
 
     - name: Log in to Amazon ECR
@@ -86,6 +74,17 @@ jobs:
         mask-password: false
         registry-type: private
         skip-logout: false
+
+    - name: Determine Docker image tag
+      id: get_version
+      run: |
+        if [ "${GITHUB_REF_TYPE}" == "tag" ]; then
+          VERSION=${GITHUB_REF_NAME}
+        else
+          VERSION=$(git describe --tags --always)
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "VERSION=$VERSION"  # Debug output
 
     - name: Build, tag, and push image to Amazon ECR
       env:
@@ -106,10 +105,10 @@ jobs:
       run: |
         echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
         chmod 600 $HOME/.kube/config
-    
+
     - name: Print Kubeconfig
       run: cat $HOME/.kube/config
-    
+
     - name: Check Kubeconfig permissions
       run: ls -l $HOME/.kube/config
 
