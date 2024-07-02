@@ -21,6 +21,21 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Get the version from the argument
+VERSION=$1
+if [ -z "$VERSION" ]; then
+  echo "No version provided. Please provide the version as the first argument."
+  exit 1
+fi
+
+# Update the deployment image with the provided version
+echo "Updating deployment image to version $VERSION..."
+kubectl --kubeconfig="$KUBE_CONFIG" set image deployment/"$DEPLOYMENT_NAME" mywebapp-container=891377120087.dkr.ecr.us-east-1.amazonaws.com/rakbank:$VERSION -n "$NAMESPACE"
+if [ $? -ne 0 ]; then
+  echo "Failed to update the deployment image. Please check your configuration."
+  exit 1
+fi
+
 # Deploy the application
 echo "Deploying application to Kubernetes..."
 kubectl --kubeconfig="$KUBE_CONFIG" apply -f mywebapp/templates/deployment.yaml -n "$NAMESPACE"
@@ -56,7 +71,5 @@ if [ $? -ne 0 ]; then
   echo "Ingress creation failed or timed out."
   exit 1
 fi
-
-echo "Ingress creation completed successfully."
 
 echo "Deployment, service, and ingress creation completed successfully."
