@@ -38,15 +38,12 @@ jobs:
     - name: List target directory contents
       run: ls -l target
 
-    - name: Determine Docker image tag
+    - name: Set Docker image tag
       id: get_version
-      run: |
-        if [ "${GITHUB_REF_TYPE}" == "tag" ]; then
-          VERSION=${GITHUB_REF_NAME}
-        else
-          VERSION=$(git describe --tags --always)
-        fi
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
+      run: echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV  # Using ref name directly
+
+    - name: Debug VERSION
+      run: echo "VERSION is ${{ env.VERSION }}"  # Debug output to verify VERSION is set
     
 
     - name: Configure AWS credentials
@@ -97,7 +94,7 @@ jobs:
       env:
         AWS_REGION: us-east-1
         JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.11-9/x64
-        VERSION: ${{ github.sha }}
+        VERSION: ${{ env.VERSION }}
         AWS_DEFAULT_REGION: us-east-1
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
