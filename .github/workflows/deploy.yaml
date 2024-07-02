@@ -13,7 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION: us-east-1  # Set the AWS region as an environment variable
+      AWS_REGION: us-east-1
+      
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
     - name: Checkout code
@@ -27,33 +31,46 @@ jobs:
         java-package: 'jdk'
         architecture: 'x64'
         check-latest: false
-        server-id: 'github'
-        server-username: ${{ secrets.GITHUB_ACTOR }}
-        server-password: ${{ secrets.GITHUB_TOKEN }}
-        overwrite-settings: true
+
+    - name: Analyze with SonarCloud
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn sonar:sonar -Dsonar.projectKey=abhaygha_Rakbank_App_Deploy -Dsonar.organization=abhaygha -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+    - name: Check SonarCloud Quality Gate
+      uses: sonarsource/sonarcloud-github-action@v3
+      with:
+        token: ${{ secrets.SONAR_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check Quality Gate Status
+      id: check_quality_gate
+      run: |
+          quality_gate_status=$(curl -s -H "Authorization: token ${{ secrets.SONAR_TOKEN }}" \
+            -X GET "https://sonarcloud.io/api/qualitygates/project_status?projectKey=abhaygha_Rakbank_App_Deploy" | \
+            jq -r '.projectStatus.status')
+          coverage=$(curl -s -H "Authorization: token ${{ secrets.SONAR_TOKEN }}" \
+            -X GET "https://sonarcloud.io/api/measures/component?component=abhaygha_Rakbank_App_Deploy&metricKeys=coverage" | \
+            jq -r '.component.measures[0].value')
+          echo "Quality Gate Status: $quality_gate_status"
+          echo "Coverage: $coverage"
+          if [ "$quality_gate_status" != "OK" ]; then
+            echo "Quality Gate failed!"
+            exit 1
+          fi
+          if (( $(echo "$coverage < 85" | bc -l) )); then
+            echo "Coverage below 85%!"
+            exit 1
+          fi  
 
     - name: Build with Maven
       run: mvn clean package
 
-    - name: List target directory contents
-      run: ls -l target
-
-    - name: Determine Docker image tag
-      id: get_version
-      run: |
-        if [ "${GITHUB_REF_TYPE}" == "tag" ]; then
-          VERSION=${GITHUB_REF_NAME}
-        else
-          VERSION=$(git describe --tags --always)
-        fi
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-        echo "VERSION=$VERSION"  # Debug output
-
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        role-to-assume: arn:aws:iam::891377120087:role/github-action-role
         aws-region: us-east-1
 
     - name: Log in to Amazon ECR
@@ -99,13 +116,3 @@ jobs:
         JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.11-9/x64
         VERSION: ${{ env.VERSION }}
         AWS_DEFAULT_REGION: us-east-1
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        KUBECONFIG: ${{ secrets.KUBECONFIG }}
-
-    - name: Analyze with SonarCloud
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      run: mvn sonar:sonar -Dsonar.projectKey=abhaygha_Rakbank_App_Deploy -Dsonar.organization=abhaygha -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-      
