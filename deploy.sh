@@ -3,6 +3,8 @@
 # Set the namespace and deployment name
 NAMESPACE="default"
 DEPLOYMENT_NAME="mywebapp-deployment"
+SERVICE_NAME="mywebapp-service"  # Ensure this matches the name in your service.yaml
+INGRESS_NAME="mywebapp-ingress"
 
 # Ensure kubectl is configured correctly
 KUBE_CONFIG=${KUBECONFIG:-"$HOME/.kube/config"}
@@ -49,8 +51,9 @@ echo "Exposing application via service..."
 kubectl --kubeconfig="$KUBE_CONFIG" apply -f mywebapp/templates/service.yaml -n "$NAMESPACE"
 
 # Check service status
+SERVICE_NAME="mywebapp-service"  # Ensure this matches the name in your service.yaml
 echo "Waiting for service to be created..."
-kubectl --kubeconfig="$KUBE_CONFIG" wait --for=condition=available --timeout=60s service/"$DEPLOYMENT_NAME" -n "$NAMESPACE"
+kubectl --kubeconfig="$KUBE_CONFIG" wait --for=condition=available --timeout=60s service/"$SERVICE_NAME" -n "$NAMESPACE"
 if [ $? -ne 0 ]; then
   echo "Service creation failed or timed out."
   exit 1
@@ -61,8 +64,9 @@ echo "Creating Ingress for the application..."
 kubectl --kubeconfig="$KUBE_CONFIG" apply -f mywebapp/templates/ingress.yaml -n "$NAMESPACE"
 
 # Check ingress status
+INGRESS_NAME="mywebapp-ingress"  # Ensure this matches the name in your ingress.yaml
 echo "Waiting for Ingress to be created..."
-kubectl --kubeconfig="$KUBE_CONFIG" wait --for=condition=ready --timeout=60s ingress/"mywebapp-ingress" -n "$NAMESPACE"
+kubectl --kubeconfig="$KUBE_CONFIG" wait --for=condition=ready --timeout=60s ingress/"$INGRESS_NAME" -n "$NAMESPACE"
 if [ $? -ne 0 ]; then
   echo "Ingress creation failed or timed out."
   exit 1
