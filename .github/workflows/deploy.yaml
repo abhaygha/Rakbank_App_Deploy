@@ -33,7 +33,7 @@ jobs:
         architecture: 'x64'
         check-latest: false
 
-    - name: Compile and run tests (without packaging)
+    - name: Run tests and generate coverage report
       run: mvn clean verify
 
     - name: Analyze with SonarCloud
