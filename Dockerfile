@@ -7,6 +7,8 @@ WORKDIR /app
 # Copy the entire project directory to the container
 COPY . .
 
+RUN chmod +x ./mvnw
+
 # Build the application
 RUN ./mvnw clean package
 
