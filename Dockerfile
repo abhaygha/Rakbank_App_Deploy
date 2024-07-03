@@ -4,13 +4,14 @@ FROM openjdk:17-jdk-alpine
 # Set the working directory in the container
 WORKDIR /app
 
-RUN ls -l ./target
+# Copy the entire project directory to the container
+COPY . .
 
-# Copy the application JAR file to the container
-COPY target/com.rakbank_project-0.0.1-SNAPSHOT.jar /app/myapp.jar
+# Build the application
+RUN ./mvnw clean package
 
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java","-jar","/app/myapp.jar"]
+ENTRYPOINT ["java","-jar","/app/target/com.rakbank_project-0.0.1-SNAPSHOT.jar"]
