@@ -159,30 +159,6 @@ jobs:
       - name: Grant execute permission to deploy.sh
         run: chmod +x ./deploy.sh
 
-      - name: Configure AWS credentials using OIDC
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: arn:aws:iam::891377120087:role/github-action-role
-          aws-region: us-east-1
-          audience: sts.amazonaws.com
-          role-session-name: deploy-session
-  
-      - name: Set up kubeconfig
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-  
-      - name: Print Kubeconfig (Debug)
-        run: cat $HOME/.kube/config
-  
-      - name: Check Kubeconfig permissions (Debug)
-        run: ls -l $HOME/.kube/config
-  
-      - name: Test Kubernetes connectivity (Debug)
-        run: |
-          export KUBECONFIG=$HOME/.kube/config
-          kubectl cluster-info
-
       - name: Run deploy.sh
         run: |
           export KUBECONFIG=$HOME/.kube/config
