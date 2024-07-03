@@ -10,13 +10,6 @@ INGRESS_NAME="mywebapp-ingress"
 # Ensure kubectl is configured correctly
 export KUBECONFIG=${KUBECONFIG:-"$HOME/.kube/config"}
 
-# Check connectivity to Kubernetes cluster
-kubectl cluster-info > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-  echo "Failed to connect to Kubernetes cluster. Please check your KUBECONFIG."
-  exit 1
-fi
-
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace

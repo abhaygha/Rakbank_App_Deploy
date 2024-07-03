@@ -176,6 +176,7 @@ jobs:
 
       - name: Run deploy.sh
         run: |
+          export KUBECONFIG=$HOME/.kube/config
           ./deploy.sh ${{ env.VERSION }}
         env:
           AWS_REGION: us-east-1
