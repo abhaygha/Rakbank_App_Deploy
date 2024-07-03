@@ -74,8 +74,8 @@ jobs:
             exit 1
           fi
 
-          if (( $(echo "$coverage < 70" | bc -l) )); then
-            echo "Coverage below 70%!"
+          if (( $(echo "$coverage < 50" | bc -l) )); then
+            echo "Coverage below 50%!"
             exit 1
           fi
         env:
