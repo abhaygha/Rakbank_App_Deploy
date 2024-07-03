@@ -165,6 +165,9 @@ jobs:
           role-to-assume: arn:aws:iam::891377120087:role/github-action-role
           aws-region: us-east-1
           audience: sts.amazonaws.com
+          role-session-name: deploy-session
+        env:
+          ACTIONS_STEP_DEBUG: true
   
       - name: Set up kubeconfig
         run: |
