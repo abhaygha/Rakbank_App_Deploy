@@ -144,7 +144,7 @@ jobs:
           ECR_REPOSITORY: rakbank
           VERSION: ${{ env.VERSION }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION --no-cache .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
 
   deploy:
