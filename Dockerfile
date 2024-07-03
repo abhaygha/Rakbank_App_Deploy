@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-alpine
 WORKDIR /app
 
 # Copy the application JAR file to the container
-COPY Rakbank_App_Deploy/target/com.rakbank_project-0.0.1-SNAPSHOT.jar /app/myapp.jar
+COPY ./target/com.rakbank_project-0.0.1-SNAPSHOT.jar /app/myapp.jar
 
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
