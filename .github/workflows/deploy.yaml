@@ -157,6 +157,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::891377120087:role/github-action-role
+          aws-region: us-east-1
+  
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region $AWS_REGION --name eks_cluster_demo
+
       - name: Grant execute permission to deploy.sh
         run: chmod +x ./deploy.sh
 
@@ -173,15 +182,6 @@ jobs:
 
       - name: Check Kubeconfig permissions
         run: ls -l $HOME/.kube/config
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: arn:aws:iam::891377120087:role/github-action-role
-          aws-region: us-east-1
-  
-      - name: Update kubeconfig
-        run: aws eks update-kubeconfig --region $AWS_REGION --name eks_cluster_demo
 
       - name: Run deploy.sh
         run: |
