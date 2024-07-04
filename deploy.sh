@@ -7,8 +7,10 @@ DEPLOYMENT_NAME="mywebapp-deployment"
 SERVICE_NAME="mywebapp-service"
 INGRESS_NAME="mywebapp-ingress"
 
-# Ensure kubectl is configured correctly
-export KUBECONFIG=${KUBECONFIG:-"$HOME/.kube/config"}
+export KUBECONFIG=$HOME/.kube/config
+
+# Check if KUBECONFIG is pointing to the right context
+kubectl config get-contexts
 
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
