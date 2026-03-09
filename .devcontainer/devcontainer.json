@@ -1,0 +1,21 @@
+{
+  "name": "Rakbank App (Java 17 / Maven)",
+  "image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installMaven": "true",
+      "installGradle": "false"
+    }
+  },
+  "postCreateCommand": "mvn -q -DskipTests compile",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot-dashboard"
+      ]
+    }
+  },
+  "forwardPorts": [8080]
+}
